@@ -3,12 +3,11 @@
  */
 package excel;
 
-import utils.DataVo;
-import utils.PartSales;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
+import utils.DataVo;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -130,7 +129,7 @@ public class ExcelIO {
     }
     
     //헤더부분 폼
-    static public void makeHeaderFormExcel(String formName, XSSFSheet sheet, XSSFCellStyle cellStyle, int rowIdx, int cellIdx) {
+    static private void makeHeaderFormExcel(String formName, XSSFSheet sheet, XSSFCellStyle cellStyle, int rowIdx, int cellIdx) {
         
         int beginCellIdx = cellIdx;
         
@@ -172,7 +171,7 @@ public class ExcelIO {
         }
     }
     //바디부분 폼
-    static public void makeBodyFormExcel(String month, Map<String, Long> data, XSSFSheet sheet, int rowIdx, int cellIdx) {
+    static private void makeBodyFormExcel(String month, Map<String, Long> data, XSSFSheet sheet, int rowIdx, int cellIdx) {
         
         XSSFRow row = sheet.createRow(rowIdx);
         XSSFCell cell;
@@ -218,6 +217,21 @@ public class ExcelIO {
         }
     }
     
+    //헤더부분 폼 스타일
+    static private void HeaderCellStyle(XSSFCellStyle cellStyle) {
+        //align 지정
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        
+        //border 지정
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        
+        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyle.setFillForegroundColor(IndexedColors.AQUA.index);
+    }
     //바디부분 폼 월 스타일
     static private void BodyCellStyleMonth(XSSFCell cell, XSSFSheet sheet) {
         CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
@@ -234,98 +248,12 @@ public class ExcelIO {
         cellStyle.setDataFormat(dataFormat.getFormat("_-₩* #,##0_-;-₩* #,##0_-;_-₩* \"-\"_-;_-@_-"));
         cell.setCellStyle(cellStyle);
     }
-    //헤더부분 폼 스타일
-    static private void HeaderCellStyle(XSSFCellStyle cellStyle) {
-        //align 지정
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        
-        //border 지정
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        
-        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        cellStyle.setFillForegroundColor(IndexedColors.AQUA.index);
-    }
     //셀 border 스타일
     static private void setBorder(CellStyle cellStyle) {
         cellStyle.setBorderBottom(BorderStyle.THIN);
         cellStyle.setBorderLeft(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);
         cellStyle.setBorderTop(BorderStyle.THIN);
-    }
-    
-    static public void WriteExcel(Map<String, DataVo> data) {
-        
-        String path = prefix + "/양식/선명희 매출 양식.xlsx";
-        
-        File file = new File(path);
-        
-        if (file.exists() && file.isFile()) {
-            try {
-                System.out.println("파일 생성 중");
-                
-                FileInputStream fileInput = new FileInputStream(file);
-                workbook = new XSSFWorkbook(fileInput);
-                XSSFSheet sheet = workbook.getSheetAt(0);
-                
-                int rowIdx = 18;
-                int cellIdx = 2;
-                
-                
-                for (Map.Entry<String, DataVo> entry : data.entrySet()) {
-                    
-                    String key = entry.getKey();
-                    DataVo item = entry.getValue();
-                    
-                    DataVo vo = data.get(key);
-                    int tempColIdx = cellIdx;
-                    
-                    XSSFRow row;
-                    XSSFCell cell;
-                    
-                    //배달업체 이름 입력
-                    row  = sheet.getRow(rowIdx);
-                    cell = row.getCell(tempColIdx + 1);
-                    cell.setCellValue(key);
-                    
-                    //2번째 블럭부터 값이므로 2개 증가
-                    rowIdx += 2;
-                    
-                    //월을 정렬
-                    List<String> list = new ArrayList<>(item.getData().keySet());
-                    Collections.sort(list);
-                    for (int i = 0; i < list.size(); i++) {
-                        row = sheet.getRow(rowIdx++);
-                        PartSales partSales = vo.getPartData(list.get(i));
-                        
-                        row.getCell(tempColIdx).setCellValue(list.get(i) + "월");
-                        row.getCell(tempColIdx + 1).setCellValue(partSales.getPartVal("카드매출"));
-                        row.getCell(tempColIdx + 2).setCellValue(partSales.getPartVal("현금매출"));
-                        row.getCell(tempColIdx + 3).setCellValue(partSales.getPartVal("기타매출"));
-                        
-                    }
-                    rowIdx += 2;
-                }
-                
-                String curDate = new SimpleDateFormat("YYMMdd").format(new Date(System.currentTimeMillis()));
-                String makeFilePath = prefix + "/매출파일_" + curDate + ".xlsx";
-                File makeFile = new File(makeFilePath);
-                FileOutputStream fos = new FileOutputStream(makeFile);
-                workbook.write(fos);
-                workbook.close();
-                fos.close();
-                
-                System.out.println("실행완료");
-                
-            } catch (Exception e) {
-                // TODO: handle exception
-                System.out.println(e);
-            }
-        }
-        
     }
     
 }
