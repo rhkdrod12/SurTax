@@ -1,10 +1,12 @@
 package excel;
 
 import utils.DataVo;
+import utils.Path;
 
 public interface ReadExcel {
     
-    String prefix = "C:\\Users\\Kim\\Desktop\\test\\매출자료생성기 - 복사본\\부가세자료";
+    final String prefix = Path.BASE_PATH + "/부가세자료";
+    final String suffix = "/매출";
     
     DataVo ReadFile();
 }

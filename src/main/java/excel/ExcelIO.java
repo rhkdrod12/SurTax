@@ -8,6 +8,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.*;
 import utils.DataVo;
+import utils.Path;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -20,7 +21,7 @@ import java.util.*;
  */
 public class ExcelIO {
     
-    private static String prefix = "C:\\Users\\Kim\\Desktop\\test\\매출자료생성기 - 복사본";
+    
     
     static public List<List<String>> ReadExcel(String path, int sheetIdx, int statRow, int startCell, int cellCount) {
         
@@ -74,6 +75,7 @@ public class ExcelIO {
         return null;
     }
     
+    private static String basePath = Path.BASE_PATH;
     static XSSFWorkbook workbook;
     static int startRowIdx = 31;
     static int statColumnIdx = 2;
@@ -81,7 +83,7 @@ public class ExcelIO {
     
     static public void WriteExcel2(Map<String, DataVo> data) {
         
-        String path = prefix + "/양식/선명희 매출 양식Test.xlsx";
+        String path = basePath + "/양식/선명희 매출 양식Test.xlsx";
         File file = new File(path);
         try {
             FileInputStream fileInput = new FileInputStream(file);
@@ -91,6 +93,11 @@ public class ExcelIO {
             
             int rowIdx = startRowIdx;
             int cellIdx = statColumnIdx;
+    
+            // XSSFCellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+            // XSSFRow row = sheet.createRow(rowIdx);
+            // XSSFCell cell = row.createCell(cellIdx);
+            // cell.setCellValue("배달");
             
             for (Map.Entry<String, DataVo> val : data.entrySet()) {
                 
@@ -112,7 +119,7 @@ public class ExcelIO {
             }
             
             String curDate = new SimpleDateFormat("YYMMdd").format(new Date(System.currentTimeMillis()));
-            String makeFilePath = prefix + "/매출파일_" + curDate + ".xlsx";
+            String makeFilePath = basePath + "/매출파일_" + curDate + ".xlsx";
             File makeFile = new File(makeFilePath);
             FileOutputStream fos = new FileOutputStream(makeFile);
             workbook.write(fos);
@@ -206,7 +213,7 @@ public class ExcelIO {
         
         cell = row.createCell(startCellIdx);
         cell.setCellValue("합계");
-        BodyCellStyleMonth(cell, sheet);
+        AlignCenter(cell, sheet);
         
         for (int cellIdx = startCellIdx + 1; cellIdx <= endCellIdx; cellIdx++) {
             String sColLetter = CellReference.convertNumToColString(cellIdx);
@@ -235,21 +242,32 @@ public class ExcelIO {
     //바디부분 폼 월 스타일
     static private void BodyCellStyleMonth(XSSFCell cell, XSSFSheet sheet) {
         CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
-        setBorder(cellStyle);
+        DataFormat dataFormat = sheet.getWorkbook().createDataFormat();
+        Border(cellStyle);
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setDataFormat(dataFormat.getFormat("@월"));
         cell.setCellStyle(cellStyle);
         cell.setCellType(CellType.STRING);
+        
     }
     //바디부분 폼 값 스타일
     static private void BodyCellStyleValue(XSSFCell cell, XSSFSheet sheet) {
         CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
         DataFormat dataFormat = sheet.getWorkbook().createDataFormat();
-        setBorder(cellStyle);
+        Border(cellStyle);
         cellStyle.setDataFormat(dataFormat.getFormat("_-₩* #,##0_-;-₩* #,##0_-;_-₩* \"-\"_-;_-@_-"));
         cell.setCellStyle(cellStyle);
     }
+    //셀 가운데, border
+    static private void AlignCenter(XSSFCell cell, XSSFSheet sheet) {
+        CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+        Border(cellStyle);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cell.setCellStyle(cellStyle);
+        cell.setCellType(CellType.STRING);
+    }
     //셀 border 스타일
-    static private void setBorder(CellStyle cellStyle) {
+    static private void Border(CellStyle cellStyle) {
         cellStyle.setBorderBottom(BorderStyle.THIN);
         cellStyle.setBorderLeft(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);

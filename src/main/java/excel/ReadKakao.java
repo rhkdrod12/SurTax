@@ -2,6 +2,7 @@ package excel;
 
 import utils.DataVo;
 import utils.Oper;
+import utils.Path;
 import utils.PricePattern;
 
 import java.io.File;
@@ -10,12 +11,12 @@ import java.util.List;
 public class ReadKakao implements ReadExcel {
     
     //읽어올 경로 지정
-    String path = "/카카오/매출";
+    String path = Path.KAKAO_PATH;
     
     @Override
     public DataVo ReadFile() {
-        
-        String dirPath = prefix + path;
+    
+        String dirPath = prefix + path + suffix;
     
         DataVo kakao = new DataVo("카카오", PricePattern.Kakao);
         

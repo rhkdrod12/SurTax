@@ -3,8 +3,7 @@
  */
 package utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Kim
@@ -56,8 +55,12 @@ public class DataVo{
 			return result;
 		}
 		
+		
 		result += "----------------------------------------------------------------\n";
-		for(String key : map.keySet()) {
+		List<String> list = new ArrayList<>(map.keySet());
+		Collections.sort(list);
+		
+		for(String key : list) {
 			result += key+"월" + map.get(key)+"\n";
 		}
 		

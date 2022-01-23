@@ -2,6 +2,7 @@ package excel;
 
 import utils.DataVo;
 import utils.Oper;
+import utils.Path;
 import utils.PricePattern;
 
 import java.io.File;
@@ -10,12 +11,12 @@ import java.util.List;
 public class ReadYugio implements ReadExcel {
     
     //읽어올 경로 지정
-    String path = "/요기오/매출";
+    String path = Path.YUGIO_PATH;
     
     @Override
     public DataVo ReadFile() {
-        
-        String dirPath = prefix + path;
+    
+        String dirPath = prefix + path + suffix;
     
         DataVo yugio = new DataVo("요기오", PricePattern.Yugio);
         
